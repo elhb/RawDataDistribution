@@ -15,7 +15,7 @@ def get_args():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-r',"--reads-file", help="barcode reads file/fwd read/first read/read one (must be gzipped fastq format)",metavar='<file>',required=True)
     parser.add_argument('-b',"--barcode-file", help="ID file with barcodes and positions",metavar='<file>',required=True)
-    parser.add_argument('-i',"--img-file", help="image file name (pdf)",required=True,metavar='<file>')
+    parser.add_argument('-i',"--img-file", help="file name for the output image (pdf)",required=True,metavar='<file>')
     parser.add_argument('-s',"--stop-after", help="stop after this many reads",required=False,metavar='<int>',default=0,type=int)
     parser.add_argument('-p',"--plot-every", help="print plot to pdf after this many reads",required=False,metavar='<int>',default=100000,type=int)
     parser.add_argument('-c',"--color-map", help='choose colormap for the plot ("red" or "heat", red is default)',required=False,metavar='<str>',default='red',type=str)
