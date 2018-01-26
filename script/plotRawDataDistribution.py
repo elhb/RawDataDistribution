@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.cm as colormap
 import gzip
 import sys
 import time
@@ -9,7 +10,7 @@ def get_args():
     """
     Function for getting the commandline arguments
     """
-    
+
     if len( sys.argv) ==1: sys.argv.append('--help')
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-r',"--reads-file", help="barcode reads file/fwd read/first read/read one (must be gzipped fastq format)",metavar='<file>',required=True)
@@ -17,12 +18,13 @@ def get_args():
     parser.add_argument('-i',"--img-file", help="image file name (pdf)",required=True,metavar='<file>')
     parser.add_argument('-s',"--stop-after", help="stop after this many reads",required=False,metavar='<int>',default=0,type=int)
     parser.add_argument('-p',"--plot-every", help="print plot to pdf after this many reads",required=False,metavar='<int>',default=100000,type=int)
+    parser.add_argument('-c',"--color-map", help='choose colormap for the plot ("red" or "heat", red is default)',required=False,metavar='<str>',default='red',type=str)
     parser.add_argument('-v',"--verbose", help="print more stuff to stderr",required=False,default=False,action="store_true")
 
-    
-    _args = parser.parse_args()    
+
+    _args = parser.parse_args()
     if _args.verbose: sys.stderr.write( 'LOGMSG: Arguments from commandline now in memory.\n' )
-    
+
     return _args
 
 def thousandString(string):
@@ -57,23 +59,29 @@ def plot( data, args, counter ):
                 plot_c_0.append(c_)
 
     junk = plt.title(str(round(counter/4000000.0,1))+'Mreads')
-    junk = plt.scatter(plot_x, plot_y, c=plot_c, cmap='PuRd')#, cmap='PuBu_r')
+    if args.color_map == 'red': cmap = colormap.PuRd
+    elif args.color_map == 'heat':cmap = colormap.afmhot
+    else:
+        sys.stderr.write('ERROR:: do not recognize the choice of color map pleease select between "red" and "heat".\n')
+        sys.exit(1)
+
+    junk = plt.scatter(plot_x, plot_y, c=plot_c, cmap=cmap, edgecolors='black')
     ax = plt.gca()
-    ax.set_ylim(ax.get_ylim()[::-1])            
+    ax.set_ylim(ax.get_ylim()[::-1])
     junk = plt.colorbar()
     junk = plt.savefig(args.img_file, format='pdf')
     junk = plt.close()
 
 def main():
-    
+
     args = get_args()
-    
+
     bcs_file = open(args.barcode_file)
     bcs = {line.split()[0]:(int(line.split()[1]),int(line.split()[2])) for line in bcs_file}
     reads_file = gzip.open(args.reads_file)
     data = { x:{} for x in range(35) }
     for x in range(35): data[x] = { y:0 for y in range(35) }
-    
+
     counter = 0
     bc_perfect = 0
     start_time = time.time()
