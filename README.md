@@ -16,7 +16,7 @@ plotRawDataDistribution.py \
 --img-file raw_data_dist.pdf
 ```
 
-# To get help:
+## To get help:
 ```
 $ plotRawDataDistribution.py --help
 usage: plotRawDataDistribution.py [-h] -r <file> -b <file> -i <file>
